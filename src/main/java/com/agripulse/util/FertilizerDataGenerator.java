@@ -4,10 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
+import com.agripulse.model.Farm;
 import com.agripulse.model.FertilizerRequest;
 
 /**
- * Generates repeatable synthetic FertilizerRequest datasets for
+ * Generates repeatable synthetic Farm + FertilizerRequest datasets for
  * benchmarking the 0/1 Knapsack DP algorithm against baseline algorithms.
  *
  * A fixed seed is used so the same dataset can be regenerated exactly
@@ -35,6 +36,10 @@ public class FertilizerDataGenerator {
             "LOW", "MEDIUM", "HIGH"
     };
 
+    private static final String[] CROP_TYPES = {
+            "Tea", "Rubber", "Coconut"
+    };
+
     public static List<FertilizerRequest> generate(int count) {
         return generate(count, DEFAULT_SEED);
     }
@@ -44,13 +49,14 @@ public class FertilizerDataGenerator {
         List<FertilizerRequest> requests = new ArrayList<>(count);
 
         for (int i = 1; i <= count; i++) {
-            String farmName = "Farm-" + i;
+            Farm farm = new Farm(
+                    "Farm-" + i,
+                    String.format("07%08d", 10000000 + i),
+                    REGIONS[random.nextInt(REGIONS.length)],
+                    CROP_TYPES[random.nextInt(CROP_TYPES.length)],
+                    1.0 + random.nextDouble() * 9.0 // land size between 1.0 and 10.0 acres
+            );
 
-            // Synthetic but uniquely-formatted contact number (not a real phone system,
-            // just guarantees uniqueness for this identifier field)
-            String contactNumber = String.format("07%08d", 10000000 + i);
-
-            String region = REGIONS[random.nextInt(REGIONS.length)];
             String fertilizerType = FERTILIZER_TYPES[random.nextInt(FERTILIZER_TYPES.length)];
             String urgencyLevel = URGENCY_LEVELS[random.nextInt(URGENCY_LEVELS.length)];
 
@@ -60,10 +66,7 @@ public class FertilizerDataGenerator {
                     (MAX_BENEFIT - MIN_BENEFIT) * random.nextDouble();
             benefitScore = Math.round(benefitScore * 100.0) / 100.0;
 
-            requests.add(new FertilizerRequest(
-                    farmName, contactNumber, region, fertilizerType,
-                    requestedBags, benefitScore, urgencyLevel
-            ));
+            requests.add(new FertilizerRequest(farm, fertilizerType, requestedBags, benefitScore, urgencyLevel));
         }
 
         return requests;

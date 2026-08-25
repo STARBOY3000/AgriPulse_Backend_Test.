@@ -2,11 +2,16 @@ package com.agripulse.model;
 
 import java.time.LocalDateTime;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 
 @Entity
@@ -17,32 +22,28 @@ public class FertilizerRequest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(nullable = false)
-    private String farmName;
-
-    @Column(nullable = false, unique = true)
-    private String contactNumber;    // reliable identifier — farmName alone is not unique
-
-    @Column(nullable = false)
-    private String region;
+    @JsonBackReference
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "farm_id", nullable = false)
+    private Farm farm;
 
     @Column(nullable = false)
-    private String fertilizerType;   // e.g. "Urea", "NPK", "Compost"
+    private String fertilizerType;
 
     @Column(nullable = false)
-    private int requestedBags;       // knapsack "weight"
+    private int requestedBags;
 
     @Column(nullable = false)
-    private double benefitScore;     // knapsack "value"
+    private double benefitScore;
 
     @Column(nullable = false)
-    private String urgencyLevel = "MEDIUM"; // LOW, MEDIUM, HIGH
+    private String urgencyLevel = "MEDIUM";
 
     @Column(nullable = false)
-    private String status = "PENDING";      // PENDING, ALLOCATED, REJECTED
+    private String status = "PENDING";
 
     @Column
-    private int allocatedBags = 0;   // filled in after DP runs (0 or full requestedBags)
+    private int allocatedBags = 0;
 
     @Column(nullable = false)
     private LocalDateTime requestDate = LocalDateTime.now();
@@ -53,11 +54,9 @@ public class FertilizerRequest {
     public FertilizerRequest() {
     }
 
-    public FertilizerRequest(String farmName, String contactNumber, String region, String fertilizerType,
-                              int requestedBags, double benefitScore, String urgencyLevel) {
-        this.farmName = farmName;
-        this.contactNumber = contactNumber;
-        this.region = region;
+    public FertilizerRequest(Farm farm, String fertilizerType, int requestedBags,
+                              double benefitScore, String urgencyLevel) {
+        this.farm = farm;
         this.fertilizerType = fertilizerType;
         this.requestedBags = requestedBags;
         this.benefitScore = benefitScore;
@@ -67,8 +66,6 @@ public class FertilizerRequest {
         this.createdAt = LocalDateTime.now();
     }
 
-    // Getters and setters
-
     public Long getId() {
         return id;
     }
@@ -77,28 +74,12 @@ public class FertilizerRequest {
         this.id = id;
     }
 
-    public String getFarmName() {
-        return farmName;
+    public Farm getFarm() {
+        return farm;
     }
 
-    public void setFarmName(String farmName) {
-        this.farmName = farmName;
-    }
-
-    public String getContactNumber() {
-        return contactNumber;
-    }
-
-    public void setContactNumber(String contactNumber) {
-        this.contactNumber = contactNumber;
-    }
-
-    public String getRegion() {
-        return region;
-    }
-
-    public void setRegion(String region) {
-        this.region = region;
+    public void setFarm(Farm farm) {
+        this.farm = farm;
     }
 
     public String getFertilizerType() {

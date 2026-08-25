@@ -10,5 +10,5 @@ public interface FertilizerRequestRepository extends JpaRepository<FertilizerReq
 
     List<FertilizerRequest> findByStatus(String status);
 
-    FertilizerRequest findByContactNumber(String contactNumber);
+    List<FertilizerRequest> findByFarmId(Long farmId);
 }

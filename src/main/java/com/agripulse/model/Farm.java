@@ -4,6 +4,8 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
+
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -25,20 +27,21 @@ public class Farm {
     private String farmName;
 
     @Column(nullable = false, unique = true)
-    private String contactNumber;   // unique -> reliable identifier, farmName alone is not
+    private String contactNumber;
 
     @Column(nullable = false)
     private String region;
 
     @Column
-    private String cropType;        // e.g. "Tea", "Rubber", "Coconut"
+    private String cropType;
 
     @Column
-    private Double landSize;        // in acres/hectares — useful for future benefit-score calculations
+    private Double landSize;
 
     @Column(nullable = false, updatable = false)
     private LocalDateTime registeredAt = LocalDateTime.now();
 
+    @JsonManagedReference
     @OneToMany(mappedBy = "farm", cascade = CascadeType.ALL)
     private List<FertilizerRequest> fertilizerRequests = new ArrayList<>();
 
